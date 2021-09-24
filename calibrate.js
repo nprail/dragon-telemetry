@@ -95,7 +95,7 @@ const meansensors = async () => {
 const calibration = async () => {
   axOffset = -meanAx / 8
   ayOffset = -meanAy / 8
-  azOffset = (16384 - meanAz) / 8
+  azOffset = -meanAz / 8
 
   gxOffset = -meanGx / 4
   gyOffset = -meanGy / 4
@@ -112,7 +112,7 @@ const calibration = async () => {
       y: gyOffset,
       z: gzOffset
     }
-    console.log('using calibration', { aOffset, gOffset })
+
     sensor.calibrateAccel(aOffset)
     sensor.calibrateGyro(gOffset)
 
@@ -133,11 +133,11 @@ const calibration = async () => {
       ayOffset = ayOffset - meanAy / acelDeadzone
     }
 
-    if (Math.abs(16384 - meanAz) <= acelDeadzone) {
+    if (Math.abs(meanAz) <= acelDeadzone) {
       console.log('az ready')
       ready++
     } else {
-      azOffset = azOffset + (16384 - meanAz) / acelDeadzone
+      azOffset = azOffset - meanAz / acelDeadzone
     }
 
     if (Math.abs(meanGx) <= giroDeadzone) {
@@ -161,6 +161,7 @@ const calibration = async () => {
       gzOffset = gzOffset - meanGz / (giroDeadzone + 1)
     }
 
+    console.log('using offset', { a: aOffset, g: gOffset })
     if (ready === 6) {
       console.log('all ready')
       break
@@ -191,7 +192,7 @@ const loop = async () => {
     console.log('Your offsets:')
     console.log(axOffset, ayOffset, azOffset, gxOffset, gyOffset, gzOffset)
     console.log('Data is printed as: acelX acelY acelZ giroX giroY giroZ')
-    console.log('Check that your sensor readings are close to 0 0 16384 0 0 0')
+    console.log('Check that your sensor readings are close to 0 0 0 0 0 0')
     console.log(
       'If calibration was successful write down your offsets so you can set them in your projects using something similar to mpu.setXAccelOffset(youroffset)'
     )
