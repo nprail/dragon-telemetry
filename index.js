@@ -8,14 +8,29 @@ const { initSensor } = require('./config/sensor')
 const port = process.env.PORT ?? 3000
 const records = []
 
+const state = {
+  velocity: {
+    x: 0,
+    y: 0,
+    z: 0
+  },
+  // dt = change in time (in seconds)
+  dt: 0,
+  lastRecordTime: new Date().getTime(),
+  initialTime: new Date().getTime()
+}
+
 const app = express()
 
 const recordData = async (id, sensor) => {
   const readSensor = util.promisify(sensor.read)
 
+  const date = new Date()
+  state.dt = date.getTime() - state.initialTime
   let record = {
     id,
-    timestamp: new Date().toISOString()
+    dt: state.dt,
+    timestamp: date.toISOString()
   }
 
   try {
@@ -25,7 +40,17 @@ const recordData = async (id, sensor) => {
     record.error = err.message
   }
 
+  if (record.accel) {
+    const dt = (date.getTime() - state.lastRecordTime) / 1000
+    state.velocity.x += record.accel.x * dt
+    state.velocity.y += record.accel.y * dt
+    state.velocity.z += record.accel.z * dt
+
+    record.velocity = { ...state.velocity }
+  }
+
   records.push(record)
+  state.lastRecordTime = date.getTime()
 }
 
 const start = async () => {
