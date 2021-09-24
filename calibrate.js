@@ -102,57 +102,67 @@ const calibration = async () => {
   gzOffset = -meanGz / 4
   while (1) {
     let ready = 0
-    sensor.calibrateAccel({
+    const aOffset = {
       x: axOffset,
       y: ayOffset,
       z: azOffset
-    })
-    sensor.calibrateGyro({
+    }
+    const gOffset = {
       x: gxOffset,
       y: gyOffset,
       z: gzOffset
-    })
+    }
+    console.log('using calibration', { aOffset, gOffset })
+    sensor.calibrateAccel(aOffset)
+    sensor.calibrateGyro(gOffset)
 
     await meansensors()
     console.log('...')
 
     if (Math.abs(meanAx) <= acelDeadzone) {
+      console.log('ax ready')
       ready++
     } else {
       axOffset = axOffset - meanAx / acelDeadzone
     }
 
     if (Math.abs(meanAy) <= acelDeadzone) {
+      console.log('ay ready')
       ready++
     } else {
       ayOffset = ayOffset - meanAy / acelDeadzone
     }
 
     if (Math.abs(16384 - meanAz) <= acelDeadzone) {
+      console.log('az ready')
       ready++
     } else {
       azOffset = azOffset + (16384 - meanAz) / acelDeadzone
     }
 
     if (Math.abs(meanGx) <= giroDeadzone) {
+      console.log('gz ready')
       ready++
     } else {
       gxOffset = gxOffset - meanGx / (giroDeadzone + 1)
     }
 
     if (Math.abs(meanGy) <= giroDeadzone) {
+      console.log('gy ready')
       ready++
     } else {
       gyOffset = gyOffset - meanGy / (giroDeadzone + 1)
     }
 
     if (Math.abs(meanGz) <= giroDeadzone) {
+      console.log('gz ready')
       ready++
     } else {
       gzOffset = gzOffset - meanGz / (giroDeadzone + 1)
     }
 
     if (ready === 6) {
+      console.log('all ready')
       break
     }
   }
