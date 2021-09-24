@@ -102,13 +102,16 @@ const calibration = async () => {
   gzOffset = -meanGz / 4
   while (1) {
     let ready = 0
-    // accelgyro.setXAccelOffset(axOffset)
-    // accelgyro.setYAccelOffset(ayOffset)
-    // accelgyro.setZAccelOffset(azOffset)
-
-    // accelgyro.setXGyroOffset(gxOffset)
-    // accelgyro.setYGyroOffset(gyOffset)
-    // accelgyro.setZGyroOffset(gzOffset)
+    sensor.calibrateAccel({
+      x: axOffset,
+      y: ayOffset,
+      z: azOffset
+    })
+    sensor.calibrateGyro({
+      x: gxOffset,
+      y: gyOffset,
+      z: gzOffset
+    })
 
     await meansensors()
     console.log('...')
