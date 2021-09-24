@@ -1,13 +1,34 @@
 const i2c = require('i2c-bus')
 const MPU6050 = require('i2c-mpu6050')
-const util = require('util')
 
 const address = 0x68
 const i2c1 = i2c.openSync(1)
 
 const sensor = new MPU6050(i2c1, address)
-const readGyro = util.promisify(sensor.readGyro)
-const readAccel = util.promisify(sensor.readGyro)
+// const readGyro = util.promisify(sensor.readGyro)
+// const readAccel = util.promisify(sensor.readGyro)
+
+const readGyro = () =>
+  new Promise((resolve, reject) => {
+    sensor.readGyro((err, data) => {
+      if (err) {
+        return reject(err)
+      }
+
+      return resolve(data)
+    })
+  })
+
+const readAccel = () =>
+  new Promise((resolve, reject) => {
+    sensor.readAccel((err, data) => {
+      if (err) {
+        return reject(err)
+      }
+
+      return resolve(data)
+    })
+  })
 
 const buffersize = 1000
 const acelDeadzone = 8 // Acelerometer error allowed, make it lower to get more precision, but sketch may not converge  (default:8)

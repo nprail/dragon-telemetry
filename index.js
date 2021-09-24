@@ -1,6 +1,5 @@
 const express = require('express')
 const Papa = require('papaparse')
-const util = require('util')
 const flatten = require('flat')
 
 const { initSensor } = require('./config/sensor')
