@@ -53,16 +53,16 @@ const recordData = async (id, sensor) => {
 const start = async () => {
   const sensor = await initSensor()
 
-  sensor.calibrateAccel({
-    x: 0.01121136474609375,
-    y: -0.027642425537109376,
-    z: 16377.981936021062
-  })
-  sensor.calibrateGyro({
-    x: 6.523625238549621,
-    y: 3.0002457061068704,
-    z: 0.2755877862595422
-  })
+  // sensor.calibrateAccel({
+  //   x: 0.01121136474609375,
+  //   y: -0.027642425537109376,
+  //   z: 16377.981936021062
+  // })
+  // sensor.calibrateGyro({
+  //   x: 6.523625238549621,
+  //   y: 3.0002457061068704,
+  //   z: 0.2755877862595422
+  // })
 
   let id = 0
 
@@ -119,6 +119,7 @@ const start = async () => {
 
   setInterval(() => {
     console.log('Record Count:', id)
+    console.log(records[records.length - 1])
   }, 1000)
 }
 
