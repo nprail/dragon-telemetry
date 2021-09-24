@@ -23,8 +23,6 @@ const state = {
 const app = express()
 
 const recordData = async (id, sensor) => {
-  const readSensor = util.promisify(sensor.read)
-
   const date = new Date()
   state.dt = date.getTime() - state.initialTime
   let record = {
@@ -33,24 +31,24 @@ const recordData = async (id, sensor) => {
     timestamp: date.toISOString()
   }
 
-  try {
-    const sensorData = await readSensor()
+  sensor.read((err, sensorData) => {
+    if (err) {
+      record.error = err.message
+    }
     record = { ...record, ...sensorData }
-  } catch (err) {
-    record.error = err.message
-  }
 
-  if (record.accel) {
-    const dt = (date.getTime() - state.lastRecordTime) / 1000
-    state.velocity.x += record.accel.x * dt
-    state.velocity.y += record.accel.y * dt
-    state.velocity.z += record.accel.z * dt
+    if (record.accel) {
+      const dt = (date.getTime() - state.lastRecordTime) / 1000
+      state.velocity.x += record.accel.x * dt
+      state.velocity.y += record.accel.y * dt
+      state.velocity.z += record.accel.z * dt
 
-    record.velocity = { ...state.velocity }
-  }
+      record.velocity = { ...state.velocity }
+    }
 
-  records.push(record)
-  state.lastRecordTime = date.getTime()
+    records.push(record)
+    state.lastRecordTime = date.getTime()
+  })
 }
 
 const start = async () => {
