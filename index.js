@@ -53,16 +53,16 @@ const recordData = async (id, sensor) => {
 const start = async () => {
   const sensor = await initSensor()
 
-  // sensor.calibrateAccel({
-  //   x: 0.01121136474609375,
-  //   y: -0.027642425537109376,
-  //   z: 16377.981936021062
-  // })
-  // sensor.calibrateGyro({
-  //   x: 6.523625238549621,
-  //   y: 3.0002457061068704,
-  //   z: 0.2755877862595422
-  // })
+  sensor.calibrateAccel({
+    x: 0.02739404296875,
+    y: -0.0016529541015625,
+    z: -0.11078759765625
+  })
+  sensor.calibrateGyro({
+    x: 6.606222089694655,
+    y: 3.009538645038168,
+    z: 0.2708454198473283
+  })
 
   let id = 0
 
