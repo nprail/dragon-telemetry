@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU"
+      crossorigin="anonymous"
+    />
+
+    <title>Dragon Telemetry</title>
+  </head>
+  <body>
+    <div class="container mt-4">
+      <h1>Dragon Telemetry</h1>
+
+      <div id="app">
+        <div class="card-group mt-4">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Acceleration</h5>
+
+              <ul class="list-unstyled" v-if="data">
+                <li><b>X:</b> {{data.accel.x}}</li>
+                <li><b>Y:</b> {{data.accel.y}}</li>
+                <li><b>Z:</b> {{data.accel.z}}</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Gyro</h5>
+
+              <ul class="list-unstyled" v-if="data">
+                <li><b>X:</b> {{data.gyro.x}}</li>
+                <li><b>Y:</b> {{data.gyro.y}}</li>
+                <li><b>Z:</b> {{data.gyro.z}}</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Rotation</h5>
+
+              <ul class="list-unstyled" v-if="data">
+                <li><b>X:</b> {{data.rotation.x}}</li>
+                <li><b>Y:</b> {{data.rotation.y}}</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ"
+      crossorigin="anonymous"
+    ></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script>
+      var app = new Vue({
+        el: '#app',
+        methods: {
+          getData() {
+            this.interval = setInterval(() => {
+              axios
+                .get('/current')
+                .then((data) => {
+                  this.data = data?.data
+                  console.log(this.data)
+                })
+                .catch((err) => {
+                  console.log(err)
+                })
+            }, 10)
+          },
+        },
+        data: {
+          message: 'Hello Vue!',
+          data: null,
+          interval: null,
+        },
+        created() {
+          this.getData()
+        },
+        beforeDestroy() {
+          clearInterval(this.interval)
+        },
+      })
+    </script>
+  </body>
+</html>
