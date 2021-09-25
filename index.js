@@ -6,6 +6,7 @@ const { initSensor } = require('./config/sensor')
 
 const port = process.env.PORT ?? 3000
 const records = []
+const gsToMeters = (g) => g * 9.80665
 
 const state = {
   velocity: {
@@ -38,9 +39,9 @@ const recordData = async (id, sensor) => {
 
     if (record.accel) {
       const dt = (date.getTime() - state.lastRecordTime) / 1000
-      state.velocity.x += record.accel.x * dt
-      state.velocity.y += record.accel.y * dt
-      state.velocity.z += record.accel.z * dt
+      state.velocity.x += gsToMeters(record.accel.x) * dt
+      state.velocity.y += gsToMeters(record.accel.y) * dt
+      state.velocity.z += gsToMeters(record.accel.z) * dt
 
       record.velocity = { ...state.velocity }
     }
