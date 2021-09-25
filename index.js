@@ -53,11 +53,12 @@ const recordData = async (id, sensor) => {
 
 const start = async () => {
   const sensor = await initSensor()
+  console.log('Sensor startup')
 
   sensor.calibrateAccel({
-    x: 0.0274608154296875,
-    y: -0.001632171630859375,
-    z: -0.110832763671875
+    x: 0.21419,
+    y: -0.004934,
+    z: -0.89696
   })
   sensor.calibrateGyro({
     x: 6.605760496183205,
@@ -67,18 +68,17 @@ const start = async () => {
 
   let id = 0
 
-  setInterval(() => {
-    id += 1
-    recordData(id, sensor)
-  }, 5)
+  // wait 40 seconds before starting to record data
+  setTimeout(() => {
+    console.log('Data recording startup')
+
+    setInterval(() => {
+      id += 1
+      recordData(id, sensor)
+    }, 5)
+  }, 40000)
 
   app.use(express.static('public'))
-
-  app.get('/', (req, res) => {
-    res.send(
-      '<a href="/data">JSON Data</a><br><a href="/data.csv">CSV Data</a>'
-    )
-  })
 
   app.get('/current', (req, res, next) => {
     try {
