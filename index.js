@@ -97,6 +97,9 @@ const start = async () => {
     .on('data', (data) => {
       console.log('new line', data)
     })
+    .on('end', () => {
+      console.log('CSV file successfully processed')
+    })
 
   app.use(express.static('public'))
 
