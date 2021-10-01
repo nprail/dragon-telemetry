@@ -9,7 +9,8 @@ const gsToMeters = (g) => g * 9.80665
 
 const app = express()
 
-const toRoundedNumber = (num) => Math.round(parseFloat(num) * 100) / 100
+const round = (num) => Math.round(num * 100) / 100
+const toRoundedNumber = (num) => round(parseFloat(num))
 
 const fetchNewData = async (id) => {
   console.time(`fetchNewData-${id}`)
@@ -50,9 +51,9 @@ const fetchNewData = async (id) => {
 
     if (newRecord.accel) {
       const dtSeconds = newRecord.dt * 0.000001
-      state.velocity.x += gsToMeters(newRecord.accel.x) * dtSeconds
-      state.velocity.y += gsToMeters(newRecord.accel.y) * dtSeconds
-      state.velocity.z += gsToMeters(newRecord.accel.z) * dtSeconds
+      state.velocity.x += round(gsToMeters(newRecord.accel.x)) * dtSeconds
+      state.velocity.y += round(gsToMeters(newRecord.accel.y)) * dtSeconds
+      state.velocity.z += round(gsToMeters(newRecord.accel.z)) * dtSeconds
 
       newRecord.velocity = { ...state.velocity }
     }
