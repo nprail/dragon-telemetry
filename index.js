@@ -9,6 +9,8 @@ const gsToMeters = (g) => g * 9.80665
 
 const app = express()
 
+const toRoundedNumber = (num) => Math.round(parseFloat(num) * 100) / 100
+
 const fetchNewData = async (id) => {
   console.time(`fetchNewData-${id}`)
   const csvData = await fs.readFile(
@@ -35,9 +37,9 @@ const fetchNewData = async (id) => {
       id: state.id,
       dt: parseFloat(record.dt),
       accel: {
-        x: parseFloat(record.ax),
-        y: parseFloat(record.ay),
-        z: parseFloat(record.az)
+        x: toRoundedNumber(record.ax),
+        y: toRoundedNumber(record.ay),
+        z: toRoundedNumber(record.az)
       },
       velocity: {
         x: 0,
