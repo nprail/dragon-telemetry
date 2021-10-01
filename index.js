@@ -9,8 +9,8 @@ const gsToMeters = (g) => g * 9.80665
 
 const app = express()
 
-const fetchNewData = async () => {
-  console.time('fetchNewData')
+const fetchNewData = async (id) => {
+  console.time(`fetchNewData-${id}`)
   const csvData = await fs.readFile(
     '../MPU6050-C-CPP-Library-for-Raspberry-Pi/data.csv',
     'utf8'
@@ -26,7 +26,7 @@ const fetchNewData = async () => {
     }
   }
 
-  const finalData = jsonData.map((record) => {
+  const finalData = jsonData.data.map((record) => {
     const newRecord = {
       accel: {
         x: record.ax,
@@ -54,12 +54,14 @@ const fetchNewData = async () => {
 
   records = finalData
   console.log(finalData)
-  console.timeEnd('fetchNewData')
+  console.timeEnd(`fetchNewData-${id}`)
 }
 
 const start = async () => {
+  let id = 0
   setInterval(() => {
-    fetchNewData()
+    id += 1
+    fetchNewData(id)
   }, 100)
 
   app.use(express.static('public'))
