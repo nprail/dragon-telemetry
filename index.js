@@ -2,6 +2,7 @@ const express = require('express')
 const Papa = require('papaparse')
 const flatten = require('flat')
 const fs = require('fs-extra')
+const csv = require('csv-parser')
 
 const port = process.env.PORT ?? 3000
 let records = []
@@ -87,6 +88,15 @@ const start = async () => {
     id += 1
     fetchNewData(id)
   }, 500)
+
+  fs.createReadStream(
+    '../MPU6050-C-CPP-Library-for-Raspberry-Pi/data.csv',
+    'utf-8'
+  )
+    .pipe(csv(['ax', 'ay', 'az', 'dt']))
+    .on('data', (data) => {
+      console.log('new line', data)
+    })
 
   app.use(express.static('public'))
 
