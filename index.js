@@ -83,22 +83,19 @@ const fetchNewData = async (id) => {
 }
 
 const start = async () => {
-  let id = 0
-  setInterval(() => {
-    id += 1
-    fetchNewData(id)
-  }, 500)
+  // let id = 0
+  // setInterval(() => {
+  //   id += 1
+  //   fetchNewData(id)
+  // }, 500)
 
-  fs.createReadStream(
-    '../MPU6050-C-CPP-Library-for-Raspberry-Pi/data.csv',
-    'utf-8'
-  )
+  fs.createReadStream('../MPU6050-C-CPP-Library-for-Raspberry-Pi/data.csv', {
+    encoding: 'utf-8',
+    autoClose: false
+  })
     .pipe(csv(['ax', 'ay', 'az', 'dt']))
     .on('data', (data) => {
       console.log('new line', data)
-    })
-    .on('end', () => {
-      console.log('CSV file successfully processed')
     })
 
   app.use(express.static('public'))
