@@ -12,6 +12,15 @@ const app = express()
 const round = (num) => Math.round(num * 100) / 100
 const toRoundedNumber = (num) => round(parseFloat(num))
 
+const instantVelocityFromGs = (g, dt) => {
+  // if less than 1 g, assume it isn't actually moving
+  if (g < 1) {
+    return 0
+  }
+
+  return round(gsToMeters(g) * dt)
+}
+
 const fetchNewData = async (id) => {
   console.time(`fetchNewData-${id}`)
   const csvData = await fs.readFile(
@@ -38,9 +47,9 @@ const fetchNewData = async (id) => {
       id: state.id,
       dt: parseFloat(record.dt),
       accel: {
-        x: toRoundedNumber(record.ax),
-        y: toRoundedNumber(record.ay),
-        z: toRoundedNumber(record.az)
+        x: parseFloat(record.ax),
+        y: parseFloat(record.ay),
+        z: parseFloat(record.az)
       },
       velocity: {
         x: 0,
@@ -51,11 +60,16 @@ const fetchNewData = async (id) => {
 
     if (newRecord.accel) {
       const dtSeconds = newRecord.dt * 0.000001
-      state.velocity.x += round(gsToMeters(newRecord.accel.x)) * dtSeconds
-      state.velocity.y += round(gsToMeters(newRecord.accel.y)) * dtSeconds
-      state.velocity.z += round(gsToMeters(newRecord.accel.z)) * dtSeconds
+      state.velocity.x += instantVelocityFromGs(newRecord.accel.x, dtSeconds)
+      state.velocity.y += instantVelocityFromGs(newRecord.accel.y, dtSeconds)
+      state.velocity.z += instantVelocityFromGs(newRecord.accel.z, dtSeconds)
 
       newRecord.velocity = { ...state.velocity }
+
+      // round after doing math
+      newRecord.accel.x = toRoundedNumber(newRecord.accel.x)
+      newRecord.accel.y = toRoundedNumber(newRecord.accel.y)
+      newRecord.accel.z = toRoundedNumber(newRecord.accel.z)
     }
 
     state.id += 1
