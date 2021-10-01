@@ -16,7 +16,9 @@ const fetchNewData = async (id) => {
     'utf8'
   )
 
-  const jsonData = Papa.parse(csvData)
+  const jsonData = Papa.parse(csvData, {
+    header: true
+  })
 
   const state = {
     velocity: {
@@ -53,7 +55,6 @@ const fetchNewData = async (id) => {
   })
 
   records = finalData
-  console.log(finalData)
   console.timeEnd(`fetchNewData-${id}`)
 }
 
