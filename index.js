@@ -12,7 +12,8 @@ const app = express()
 const fetchNewData = async () => {
   console.time('fetchNewData')
   const csvData = await fs.readFile(
-    '../MPU6050-C-CPP-Library-for-Raspberry-Pi/data.csv'
+    '../MPU6050-C-CPP-Library-for-Raspberry-Pi/data.csv',
+    'utf8'
   )
 
   const jsonData = Papa.parse(csvData)
