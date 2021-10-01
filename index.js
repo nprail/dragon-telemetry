@@ -14,7 +14,7 @@ const toRoundedNumber = (num) => round(parseFloat(num))
 
 const instantVelocityFromGs = (g, dt) => {
   // if less than 1 g, assume it isn't actually moving
-  if (g < 1) {
+  if (g > -0.5 && g < 0.5) {
     return 0
   }
 
