@@ -21,6 +21,7 @@ const fetchNewData = async (id) => {
   })
 
   const state = {
+    id: 0,
     velocity: {
       x: 0,
       y: 0,
@@ -30,6 +31,7 @@ const fetchNewData = async (id) => {
 
   const finalData = jsonData.data.map((record) => {
     const newRecord = {
+      id: state.id,
       dt: parseFloat(record.dt),
       accel: {
         x: parseFloat(record.ax),
@@ -52,6 +54,8 @@ const fetchNewData = async (id) => {
       newRecord.velocity = { ...state.velocity }
     }
 
+    state.id += 1
+
     return newRecord
   })
 
@@ -64,7 +68,7 @@ const start = async () => {
   setInterval(() => {
     id += 1
     fetchNewData(id)
-  }, 100)
+  }, 500)
 
   app.use(express.static('public'))
 
