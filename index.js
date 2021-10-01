@@ -17,7 +17,8 @@ const fetchNewData = async (id) => {
   )
 
   const jsonData = Papa.parse(csvData, {
-    header: true
+    header: true,
+    skipEmptyLines: true
   })
 
   const state = {
