@@ -1,82 +1,65 @@
 const express = require('express')
 const Papa = require('papaparse')
 const flatten = require('flat')
-
-const { initSensor } = require('./config/sensor')
+const fs = require('fs-extra')
 
 const port = process.env.PORT ?? 3000
-const records = []
+let records = []
 const gsToMeters = (g) => g * 9.80665
-
-const state = {
-  velocity: {
-    x: 0,
-    y: 0,
-    z: 0
-  },
-  // dt = change in time (in seconds)
-  dt: 0,
-  lastRecordTime: new Date().getTime(),
-  initialTime: new Date().getTime()
-}
 
 const app = express()
 
-const recordData = async (id, sensor) => {
-  const date = new Date()
-  state.dt = date.getTime() - state.initialTime
-  let record = {
-    id,
-    dt: state.dt,
-    timestamp: date.toISOString()
+const fetchNewData = async () => {
+  console.time('fetchNewData')
+  const csvData = await fs.readFile(
+    '../MPU6050-C-CPP-Library-for-Raspberry-Pi/data.csv'
+  )
+
+  const jsonData = Papa.parse(csvData)
+
+  const state = {
+    velocity: {
+      x: 0,
+      y: 0,
+      z: 0
+    }
   }
 
-  sensor.read((err, sensorData) => {
-    if (err) {
-      record.error = err.message
+  const finalData = jsonData.map((record) => {
+    const newRecord = {
+      accel: {
+        x: record.ax,
+        y: record.ay,
+        z: record.az
+      },
+      velocity: {
+        x: 0,
+        y: 0,
+        z: 0
+      }
     }
-    record = { ...record, ...sensorData }
 
-    if (record.accel) {
-      const dt = (date.getTime() - state.lastRecordTime) / 1000
-      state.velocity.x += gsToMeters(record.accel.x) * dt
-      state.velocity.y += gsToMeters(record.accel.y) * dt
-      state.velocity.z += gsToMeters(record.accel.z) * dt
+    if (record.ax) {
+      const dtSeconds = record.dt * 0.000001
+      state.velocity.x += gsToMeters(record.ax) * dtSeconds
+      state.velocity.y += gsToMeters(record.ay) * dtSeconds
+      state.velocity.z += gsToMeters(record.az) * dtSeconds
 
-      record.velocity = { ...state.velocity }
+      newRecord.velocity = { ...state.velocity }
     }
 
-    records.push(record)
-    state.lastRecordTime = date.getTime()
+    return newRecord
   })
+
+  records = finalData
+  console.log(finalData)
+  console.timeEnd('fetchNewData')
 }
 
 const start = async () => {
-  const sensor = await initSensor()
-  console.log('Sensor startup')
-
-  sensor.calibrateAccel({
-    x: 0.21419,
-    y: -0.004934,
-    z: -0.89696
-  })
-  sensor.calibrateGyro({
-    x: 6.605760496183205,
-    y: 3.004923187022901,
-    z: 0.2697328244274818
-  })
-
-  let id = 0
-
-  // wait 40 seconds before starting to record data
-  setTimeout(() => {
-    console.log('Data recording startup')
-
-    setInterval(() => {
-      id += 1
-      recordData(id, sensor)
-    }, 5)
-  }, 40000)
+  setInterval(() => {
+    fetchNewData()
+  }, 100)
 
   app.use(express.static('public'))
 
@@ -117,11 +100,6 @@ const start = async () => {
   app.listen(port, () => {
     console.log(`Server listening on ${port}`)
   })
-
-  setInterval(() => {
-    console.log('Record Count:', id)
-    console.log(records[records.length - 1])
-  }, 1000)
 }
 
 start().catch((err) => {
