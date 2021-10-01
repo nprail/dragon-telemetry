@@ -30,10 +30,11 @@ const fetchNewData = async (id) => {
 
   const finalData = jsonData.data.map((record) => {
     const newRecord = {
+      dt: parseFloat(record.dt),
       accel: {
-        x: record.ax,
-        y: record.ay,
-        z: record.az
+        x: parseFloat(record.ax),
+        y: parseFloat(record.ay),
+        z: parseFloat(record.az)
       },
       velocity: {
         x: 0,
@@ -42,11 +43,11 @@ const fetchNewData = async (id) => {
       }
     }
 
-    if (record.ax) {
-      const dtSeconds = record.dt * 0.000001
-      state.velocity.x += gsToMeters(record.ax) * dtSeconds
-      state.velocity.y += gsToMeters(record.ay) * dtSeconds
-      state.velocity.z += gsToMeters(record.az) * dtSeconds
+    if (newRecord.accel) {
+      const dtSeconds = newRecord.dt * 0.000001
+      state.velocity.x += gsToMeters(newRecord.accel.x) * dtSeconds
+      state.velocity.y += gsToMeters(newRecord.accel.y) * dtSeconds
+      state.velocity.z += gsToMeters(newRecord.accel.z) * dtSeconds
 
       newRecord.velocity = { ...state.velocity }
     }
